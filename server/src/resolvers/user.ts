@@ -29,7 +29,7 @@ class FieldError {
 }
 
 @ObjectType()
-class UserRespose {
+class UserResponse {
   @Field(() => [FieldError], { nullable: true })
   errors?: FieldError[];
 
@@ -39,25 +39,49 @@ class UserRespose {
 
 @Resolver()
 export class UserResolver {
-  @Mutation(() => User)
+  @Mutation(() => UserResponse)
   async register(
     @Arg("options") options: UsernamePasswordInput,
     @Ctx() { em }: MyContext
-  ) {
+  ): Promise<UserResponse> {
+
+    if(options.password.length <= 2){
+      return{
+      errors:[{
+        field:"password",
+        message:"length must be greater than 2"
+        }
+      ]
+      }
+    
+    }
     const hashedPassword = await argon2.hash(options.password);
     const user = em.create(User, {
       username: options.username,
       password: hashedPassword,
     });
-    await em.persistAndFlush(user);
-    return user;
+    try {
+      await em.persistAndFlush(user);
+    } catch (error) {
+      if (error.code === "23505") {
+        return {
+          errors: [
+            {
+              field: "username",
+              message: "username already taken",
+            },
+          ],
+        };
+      }
+    }
+    return {user};
   }
 
-  @Mutation(() => UserRespose)
+  @Mutation(() => UserResponse)
   async login(
     @Arg("options") options: UsernamePasswordInput,
     @Ctx() { em }: MyContext
-  ): Promise<UserRespose> {
+  ): Promise<UserResponse> {
     const user = await em.findOne(User, { username: options.username });
     if (!user) {
       return {
@@ -69,8 +93,8 @@ export class UserResolver {
         ],
       };
     }
-    const valid = await argon2.verify(user.password, options.password)
-    if(!valid){
+    const valid = await argon2.verify(user.password, options.password);
+    if (!valid) {
       return {
         errors: [
           {
@@ -81,9 +105,8 @@ export class UserResolver {
       };
     }
 
-
     return {
-    user
+      user,
     };
   }
 }
