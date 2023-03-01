@@ -79,14 +79,22 @@ UserResponse = __decorate([
     (0, type_graphql_1.ObjectType)()
 ], UserResponse);
 let UserResolver = class UserResolver {
-    async register(options, { em }) {
+    me({ req, em }) {
+        if (!req.session.userId) {
+            return null;
+        }
+        const user = em.findOne(User_1.User, { id: req.session.userId });
+        return user;
+    }
+    async register(options, { em, req }) {
         if (options.password.length <= 2) {
             return {
-                errors: [{
+                errors: [
+                    {
                         field: "password",
-                        message: "length must be greater than 2"
-                    }
-                ]
+                        message: "length must be greater than 2",
+                    },
+                ],
             };
         }
         const hashedPassword = await argon2.hash(options.password);
@@ -109,9 +117,10 @@ let UserResolver = class UserResolver {
                 };
             }
         }
+        req.session.userId = user.id;
         return { user };
     }
-    async login(options, { em }) {
+    async login(options, { em, req }) {
         const user = await em.findOne(User_1.User, { username: options.username });
         if (!user) {
             return {
@@ -134,11 +143,20 @@ let UserResolver = class UserResolver {
                 ],
             };
         }
+        req.session.userId = user.id;
+        console.log("Req session", req.session);
         return {
             user,
         };
     }
 };
+__decorate([
+    (0, type_graphql_1.Query)(() => User_1.User, { nullable: true }),
+    __param(0, (0, type_graphql_1.Ctx)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], UserResolver.prototype, "me", null);
 __decorate([
     (0, type_graphql_1.Mutation)(() => UserResponse),
     __param(0, (0, type_graphql_1.Arg)("options")),
