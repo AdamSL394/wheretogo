@@ -12,11 +12,12 @@ import * as redis from "redis";
 import session from "express-session";
 import connectRedis from "connect-redis";
 import { MyContext } from "./types";
-// import cors from "cors";
+import cors from "cors";
 
 declare module "express-session" {
   export interface SessionData {
     userId: number;
+    randomKey:string
   }
 }
 
@@ -32,15 +33,16 @@ const main = async () => {
 
   app.set("trust proxy", true);
 
-  // app.use(
-  //   cors({
-  //     credentials: true,
-  //     origin: [
-  //       "https://studio.apollographql.com",
-  //       "http://localhost:4000/graphql",
-  //     ],
-  //   })
-  // );
+  app.use(
+    cors({
+      credentials: true,
+      origin: [
+        "https://studio.apollographql.com",
+        "http://localhost:4000/graphql",
+        "http://localhost:3000"
+      ],
+    })
+  );
 
   app.use(
     session({
@@ -70,7 +72,9 @@ const main = async () => {
 
   await apolloServer.start();
   apolloServer.applyMiddleware({ 
-    app});
+    app,
+    cors:false
+  });
 
   app.get("/", (_, res) => {
     res.send("Hello");
