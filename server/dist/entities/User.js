@@ -39,7 +39,7 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "username", void 0);
 __decorate([
-    (0, core_1.Property)({ type: 'text' }),
+    (0, core_1.Property)({ type: 'text', unique: true }),
     __metadata("design:type", String)
 ], User.prototype, "password", void 0);
 User = __decorate([

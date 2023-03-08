@@ -124,6 +124,15 @@
           "unique": true
         },
         {
+          "columnNames": [
+            "password"
+          ],
+          "composite": false,
+          "keyName": "user_password_unique",
+          "primary": false,
+          "unique": true
+        },
+        {
           "keyName": "user_pkey",
           "columnNames": [
             "id"
