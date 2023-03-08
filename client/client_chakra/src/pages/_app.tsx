@@ -9,7 +9,7 @@ const client = createClient({
   credentials:"include"
   }
 });
-
+ 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <Provider value={client}>
