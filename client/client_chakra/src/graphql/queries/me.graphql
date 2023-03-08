@@ -1,6 +1,8 @@
-query Query {
+query Me {
   me {
+    createdAt
     id
+    updatedAt
     username
   }
 }

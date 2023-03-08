@@ -13,6 +13,7 @@ import session from "express-session";
 import connectRedis from "connect-redis";
 import { MyContext } from "./types";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 
 declare module "express-session" {
   export interface SessionData {
@@ -32,7 +33,7 @@ const main = async () => {
   await redisClient.connect();
 
   app.set("trust proxy", true);
-
+  app.use(cookieParser());
   app.use(
     cors({
       credentials: true,
@@ -54,7 +55,7 @@ const main = async () => {
         maxAge: 1000 * 60 * 60 * 24 * 365 + 10,
         httpOnly: true,
         secure: false,
-        sameSite: "none",
+        sameSite: "lax",
       },
       saveUninitialized: false,
       secret: "keyboard cat",
@@ -73,7 +74,14 @@ const main = async () => {
   await apolloServer.start();
   apolloServer.applyMiddleware({ 
     app,
-    cors:false
+    cors: {
+      origin: [
+        "https://studio.apollographql.com",
+        "http://localhost:4000/graphql",
+        "http://localhost:3000"
+      ],
+      credentials: true,
+    },
   });
 
   app.get("/", (_, res) => {
