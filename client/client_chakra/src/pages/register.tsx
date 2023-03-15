@@ -1,4 +1,4 @@
-import { FormControl, FormLabel, Input, FormErrorMessage, DarkMode, Box, Button } from "@chakra-ui/react";
+import { Box, Button } from "@chakra-ui/react";
 import { error } from "console";
 import { Form, Formik } from "formik";
 import React from "react";
@@ -9,6 +9,8 @@ import { Wrapper } from "../components/Wrapper";
 import { useRegisterMutation } from "../generated/graphql";
 import { toErrorsMap } from "../utils/toErrorsMap";
 import { useRouter } from "next/router";
+import { withUrqlClient } from "next-urql";
+import { createUrqlClient } from "../utils/createUrqlClient";
 
 interface registerProps { }
 
@@ -61,4 +63,4 @@ export const Register: React.FC<registerProps> = ({ }) => {
     );
 };
 
-export default Register;
+export default  withUrqlClient(createUrqlClient)(Register);

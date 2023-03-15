@@ -1,5 +1,5 @@
 import { MikroORM } from "@mikro-orm/core";
-import { __prod__ } from "./constants";
+import { COOKIE_NAME, __prod__ } from "./constants";
 import mikroOrmConfig from "./mikro-orm.config";
 import express from "express";
 import "reflect-metadata";
@@ -14,6 +14,7 @@ import connectRedis from "connect-redis";
 import { MyContext } from "./types";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+
 
 declare module "express-session" {
   export interface SessionData {
@@ -47,7 +48,7 @@ const main = async () => {
 
   app.use(
     session({
-      name: "Test C0okiEs",
+      name: COOKIE_NAME,
       store: new RedisStore({
         client: redisClient,
       }),

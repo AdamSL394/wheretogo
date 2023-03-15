@@ -1,43 +1,39 @@
 import { Box, Link, Flex, Button } from "@chakra-ui/react";
 import NextLink from 'next/link'
-import { useMeQuery } from "../generated/graphql";
+import { useState } from "react";
+import { useLogoutMutation, useMeQuery } from "../generated/graphql";
+import { isServer } from "../utils/isServer";
 
 interface NavBarProps {
 }
 
 export const NavBar: React.FC<NavBarProps> =  ({ }) => {
+    const [{fetching:logoutfetching} ,logout] = useLogoutMutation();
     const [{ data, fetching }] = useMeQuery();
     let body = null;
-    console.log(fetching)
-    console.log('username', data?.me?.username)
-    if (fetching) {
-        <></>
-    } else if (!data?.me) {
-        body = (
-            <>
-                <NextLink href={'/login'}>
-                    <Link color={'white'} mr={8}>Login</Link>
-                </NextLink>
-                <NextLink href={'/register'}>
-                    <Link color={'white'} mr={14}>Register</Link>
-                </NextLink>
-            </>
-        )
-    } else {
-        body = (
-            <Flex>
-                <Box  mr={8}>
-                    {data.me.username}
-                </Box>
-                <Button mr={14}>Logout</Button>
-            </Flex>
-        )
-    }
 
+        if (fetching) {
+            console.log('1', data, fetching);
+            <div>hi</div>
+        } else if (!data?.me) {
+            console.log('2',data, fetching);
+            body = (
+                <>
+                    <NextLink href={'/login'} >Login</NextLink>
+                    <NextLink href={'/register'}>Register</NextLink>
+                </>
+            )
+        } else {
+            console.log('3',data, fetching);
+            body = (
+                <Flex>{data.me.username}
+                    <Button onClick={() => logout()}isLoading={logoutfetching}>Logout</Button>
+                </Flex>
+            )
+        }
+        
     return (
-        <Flex bg="slategrey" p={4} >
-            <Box ml={'auto'}>{body}</Box>
-        </Flex>
+        <Flex bg="slategrey" p={4} ><div>{body}</div></Flex>
     )
 
 }

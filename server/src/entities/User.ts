@@ -23,4 +23,8 @@ export class User {
   @Property({type:'text', unique: true})
   password!: string;
 
+  @Field(()=> String)
+  @Property({type:'text', unique: true})
+  email!:String
+
 }

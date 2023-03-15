@@ -1,10 +1,7 @@
 mutation Login($options: UsernamePasswordInput!){
   login(options: $options) {
      user {
-      createdAt
-      updatedAt
-      id
-      username
+      ...RegularUser
     }
     errors {
       field
