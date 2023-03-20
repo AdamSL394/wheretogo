@@ -1,34 +1,10 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const core_1 = require("@mikro-orm/core");
+exports.DataSource = void 0;
 const constants_1 = require("./constants");
-const mikro_orm_config_1 = __importDefault(require("./mikro-orm.config"));
 const express_1 = __importDefault(require("express"));
 require("reflect-metadata");
 const apollo_server_express_1 = require("apollo-server-express");
@@ -36,26 +12,47 @@ const type_graphql_1 = require("type-graphql");
 const hello_1 = require("./resolvers/hello");
 const post_1 = require("./resolvers/post");
 const user_1 = require("./resolvers/user");
-const redis = __importStar(require("redis"));
+const ioredis_1 = __importDefault(require("ioredis"));
 const express_session_1 = __importDefault(require("express-session"));
 const connect_redis_1 = __importDefault(require("connect-redis"));
 const cors_1 = __importDefault(require("cors"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
+const typeorm_1 = require("typeorm");
+Object.defineProperty(exports, "DataSource", { enumerable: true, get: function () { return typeorm_1.DataSource; } });
+const Post_1 = require("./entities/Post");
+const User_1 = require("./entities/User");
 const main = async () => {
-    const orm = await core_1.MikroORM.init(mikro_orm_config_1.default);
-    await orm.getMigrator().up();
+    const AppDataSource = new typeorm_1.DataSource({
+        type: 'postgres',
+        host: 'localhost',
+        port: 5432,
+        username: 'postgres',
+        password: 'password',
+        database: 'wheretogo',
+        synchronize: true,
+        logging: true,
+        entities: [Post_1.Post, User_1.User],
+        subscribers: [],
+        migrations: [],
+    });
+    AppDataSource.initialize()
+        .then(() => {
+        console.log("Data Source has been initialized!");
+    })
+        .catch((err) => {
+        console.error("Error during Data Source initialization", err);
+    });
     const app = (0, express_1.default)();
     const RedisStore = (0, connect_redis_1.default)(express_session_1.default);
-    const redisClient = redis.createClient({ legacyMode: true });
-    await redisClient.connect();
-    app.set("trust proxy", true);
+    const redisClient = new ioredis_1.default();
+    app.set('trust proxy', true);
     app.use((0, cookie_parser_1.default)());
     app.use((0, cors_1.default)({
         credentials: true,
         origin: [
-            "https://studio.apollographql.com",
-            "http://localhost:4000/graphql",
-            "http://localhost:3000"
+            'https://studio.apollographql.com',
+            'http://localhost:4000/graphql',
+            'http://localhost:3000',
         ],
     }));
     app.use((0, express_session_1.default)({
@@ -67,10 +64,10 @@ const main = async () => {
             maxAge: 1000 * 60 * 60 * 24 * 365 + 10,
             httpOnly: true,
             secure: false,
-            sameSite: "lax",
+            sameSite: 'lax',
         },
         saveUninitialized: false,
-        secret: "keyboard cat",
+        secret: 'keyboard cat',
         resave: false,
     }));
     const apolloServer = new apollo_server_express_1.ApolloServer({
@@ -78,25 +75,30 @@ const main = async () => {
             resolvers: [hello_1.HelloResolver, post_1.PostResolver, user_1.UserResolver],
             validate: false,
         }),
-        context: ({ req, res }) => ({ em: orm.em.fork(), req, res }),
+        context: ({ req, res }) => ({
+            req,
+            res,
+            redisClient,
+            AppDataSource
+        }),
     });
     await apolloServer.start();
     apolloServer.applyMiddleware({
         app,
         cors: {
             origin: [
-                "https://studio.apollographql.com",
-                "http://localhost:4000/graphql",
-                "http://localhost:3000"
+                'https://studio.apollographql.com',
+                'http://localhost:4000/graphql',
+                'http://localhost:3000',
             ],
             credentials: true,
         },
     });
-    app.get("/", (_, res) => {
-        res.send("Hello");
+    app.get('/', (_, res) => {
+        res.send('Hello');
     });
     app.listen(4000, () => {
-        console.log("Server up and running at Port 4000");
+        console.log('Server up and running at Port 4000');
     });
 };
 main().catch((err) => {
