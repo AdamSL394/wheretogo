@@ -11,10 +11,8 @@ export const NavBar: React.FC<NavBarProps> =  ({ }) => {
     let body = null;
 
         if (fetching) {
-            console.log('1', data, fetching);
             <div>hi</div>
         } else if (!data?.me) {
-            console.log('2',data, fetching);
             body = (
                 <>
                     <NextLink href={'/login'} >Login</NextLink>
@@ -22,7 +20,6 @@ export const NavBar: React.FC<NavBarProps> =  ({ }) => {
                 </>
             )
         } else {
-            console.log('3',data, fetching);
             body = (
                 <Flex>{data.me.username}
                     <Button onClick={() => logout()}isLoading={logoutfetching}>Logout</Button>
@@ -31,7 +28,7 @@ export const NavBar: React.FC<NavBarProps> =  ({ }) => {
         }
         
     return (
-        <Flex bg="slategrey" p={4} ><div>{body}</div></Flex>
+        <Flex position='sticky' zIndex={1} top={0} bg="slategrey" p={4} ><div>{body}</div></Flex>
     )
 
 }
