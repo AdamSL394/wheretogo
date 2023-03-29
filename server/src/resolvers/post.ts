@@ -8,6 +8,10 @@ import {
   Field,
   Ctx,
   UseMiddleware,
+  Int,
+  FieldResolver,
+  Root,
+  ObjectType,
 } from 'type-graphql';
 import { MyContext } from 'src/types';
 import { isAuth } from '../../src/middleware/isAuth';
@@ -21,11 +25,81 @@ class PostInput {
   text: string;
 }
 
-@Resolver()
+@ObjectType()
+class PaginatedPosts {
+  @Field(() => [Post])
+  posts: Post[];
+  @Field()
+  hasMore: boolean;
+}
+
+@Resolver(Post)
 export class PostResolver {
-  @Query(() => [Post])
-  async posts(): Promise<Post[]> {
-    return Post.find();
+  @FieldResolver(() => String)
+  textSnippet(@Root() root: Post) {
+    return root.text.slice(0, 50);
+  }
+
+  @Mutation(() => Boolean)
+  @UseMiddleware(isAuth)
+  async vote(
+    @Arg('postId', () => Int) postId: number,
+    @Arg("value" , () => Int) value: number,
+    @Ctx() {req, AppDataSource}: MyContext){
+    const isUpdoot = value !== -1;
+    const realValue = isUpdoot ? 1 : -1
+    const {userId} = req.session
+    await AppDataSource.query(`
+    START TRANSACTION;
+    
+    insert into updoot ("userId", "postId", value)
+    values (${userId},${postId},${realValue});
+
+    update post
+    set points = points + ${realValue}
+    where id= ${postId};
+
+    COMMIT;
+    `)
+    return true
+    }
+
+  @Query(() => PaginatedPosts)
+  async posts(
+    @Arg('limit', () => Int) limit: number,
+    @Arg('cursor', () => String, { nullable: true }) cursor: string | null,
+    @Ctx() { AppDataSource }: MyContext
+  ): Promise<PaginatedPosts> {
+    const realLimit = Math.min(50, limit);
+    const realLimitPlusOne = realLimit + 1;
+
+    const replacements: any[] = [realLimitPlusOne];
+
+    if (cursor) {
+      replacements.push(new Date(parseInt(cursor)));
+    }
+
+    const posts = await AppDataSource.query(
+      `
+    select p.*, 
+    json_build_object(
+    'id', u.id,
+    'email', u.email,
+    'username', u.username
+    ) creator
+    from post p
+    inner join public.user u on u.id = p."creatorId"
+    ${cursor ? `where p."creadtedAt" <$2` : ''}
+    order by p."createdAt" DESC
+    limit $1
+    `,
+      replacements
+    );
+
+    return {
+      posts: posts.slice(0, realLimit),
+      hasMore: posts.length === realLimitPlusOne,
+    };
   }
 
   @Query(() => Post, { nullable: true })

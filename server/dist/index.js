@@ -21,6 +21,8 @@ const typeorm_1 = require("typeorm");
 Object.defineProperty(exports, "DataSource", { enumerable: true, get: function () { return typeorm_1.DataSource; } });
 const Post_1 = require("./entities/Post");
 const User_1 = require("./entities/User");
+const path_1 = __importDefault(require("path"));
+const Updoot_1 = require("./entities/Updoot");
 const main = async () => {
     const AppDataSource = new typeorm_1.DataSource({
         type: 'postgres',
@@ -31,12 +33,12 @@ const main = async () => {
         database: 'wheretogo',
         synchronize: true,
         logging: true,
-        entities: [Post_1.Post, User_1.User],
+        entities: [Post_1.Post, User_1.User, Updoot_1.Updoot],
         subscribers: [],
-        migrations: [],
+        migrations: [path_1.default.join(__dirname, "/migrations/*")],
     });
     AppDataSource.initialize()
-        .then(() => {
+        .then(async () => {
         console.log("Data Source has been initialized!");
     })
         .catch((err) => {

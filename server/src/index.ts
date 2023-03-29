@@ -17,6 +17,8 @@ import cookieParser from 'cookie-parser';
 import { DataSource } from 'typeorm';
 import { Post } from './entities/Post';
 import { User } from './entities/User';
+import path from 'path';
+import { Updoot } from './entities/Updoot';
 
 declare module 'express-session' {
   export interface SessionData {
@@ -36,19 +38,21 @@ const main = async () => {
     database: 'wheretogo',
     synchronize: true,
     logging: true,
-    entities: [Post,User],
+    entities: [Post,User, Updoot],
     subscribers: [],
-    migrations: [],
+    migrations: [path.join(__dirname, "/migrations/*")],
   });
 
   AppDataSource.initialize()
-    .then(() => {
+    .then(async () => {
         console.log("Data Source has been initialized!")
+        //await Post.delete({})
+        // await AppDataSource.runMigrations()
     })
     .catch((err) => {
-        console.error("Error during Data Source initialization", err)
+        console.error("Error during Data Source initialization", err) 
     }) 
-
+   
   // const orm = await MikroORM.init(mikroOrmConfig);
   // await orm.getMigrator().up();
 
