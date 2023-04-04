@@ -14,10 +14,13 @@ export const NavBar: React.FC<NavBarProps> =  ({ }) => {
             <div>hi</div>
         } else if (!data?.me) {
             body = (
-                <>
-                    <NextLink href={'/login'} >Login</NextLink>
+                <span style={{width:"20%",display:"flex", flexWrap:"wrap", marginLeft:"auto"}}>
+                <span>
+
+                    <NextLink  href={'/login'} >Login</NextLink>
+                </span>
                     <NextLink href={'/register'}>Register</NextLink>
-                </>
+                </span>
             )
         } else {
             body = (
