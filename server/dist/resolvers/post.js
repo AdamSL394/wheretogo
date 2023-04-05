@@ -80,10 +80,11 @@ let PostResolver = class PostResolver {
     ) creator
     from post p
     inner join public.user u on u.id = p."creatorId"
-    ${cursor ? `where p."creadtedAt" <$2` : ''}
+    ${cursor ? `where p."createdAt" <$2` : ''}
     order by p."createdAt" DESC
     limit $1
     `, replacements);
+        console.log(posts);
         return {
             posts: posts.slice(0, realLimit),
             hasMore: posts.length === realLimitPlusOne,
