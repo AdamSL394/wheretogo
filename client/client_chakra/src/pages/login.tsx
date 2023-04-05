@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 import React from 'react';
 import { DarkModeSwitch } from '../components/DarkModeSwitch';
 import { InputField } from '../components/InputField';
+import { NavBar } from '../components/NavBar';
 import { Wrapper } from '../components/Wrapper';
 import { useLoginMutation } from '../generated/graphql';
 import { createUrqlClient } from '../utils/createUrqlClient';
@@ -15,6 +16,8 @@ export const Login: React.FC<{}> = ({}) => {
   const router = useRouter();
   const [, login] = useLoginMutation();
   return (
+    <>
+    <NavBar></NavBar>
     <Wrapper>
       <DarkModeSwitch />
       <Formik
@@ -69,6 +72,7 @@ export const Login: React.FC<{}> = ({}) => {
         )}
       </Formik>
     </Wrapper>
+    </>
   );
 };
 
