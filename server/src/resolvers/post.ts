@@ -14,7 +14,8 @@ import {
   ObjectType,
 } from 'type-graphql';
 import { MyContext } from 'src/types';
-import { isAuth } from '../../src/middleware/isAuth';
+//import { isAuth } from '../../src/middleware/isAuth';
+import { isAuth } from '../middleware/isAuth';
 
 @InputType()
 class PostInput {

@@ -24,8 +24,13 @@ export const NavBar: React.FC<NavBarProps> =  ({ }) => {
             )
         } else {
             body = (
-                <Flex>{data.me.username}
-                    <Button onClick={() => logout()}isLoading={logoutfetching}>Logout</Button>
+                <Flex mr={"auto"}>
+                    <span style={{marginRight:"auto",justifyContent:"space-around"}}>
+                        <strong>{data.me.username}</strong>
+                    </span>
+                <span style={{marginLeft:"auto"}}>
+                    <Button ml={"8%"} onClick={() => logout()}isLoading={logoutfetching}>Logout</Button>
+                </span>
                 </Flex>
             )
         }

@@ -47,7 +47,7 @@ const main = async () => {
     .then(async () => {
         console.log("Data Source has been initialized!")
         //await Post.delete({})
-        // await AppDataSource.runMigrations()
+        await AppDataSource.runMigrations()
     })
     .catch((err) => {
         console.error("Error during Data Source initialization", err) 

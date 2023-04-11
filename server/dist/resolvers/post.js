@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PostResolver = void 0;
 const Post_1 = require("../entities/Post");
 const type_graphql_1 = require("type-graphql");
-const isAuth_1 = require("../../src/middleware/isAuth");
+const isAuth_1 = require("../middleware/isAuth");
 let PostInput = class PostInput {
 };
 __decorate([
@@ -80,7 +80,7 @@ let PostResolver = class PostResolver {
     ) creator
     from post p
     inner join public.user u on u.id = p."creatorId"
-    ${cursor ? `where p."creadtedAt" <$2` : ''}
+    ${cursor ? `where p."createdAt" <$2` : ''}
     order by p."createdAt" DESC
     limit $1
     `, replacements);

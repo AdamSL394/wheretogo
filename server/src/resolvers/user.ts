@@ -148,6 +148,7 @@ export class UserResolver {
     let user;
     try {
       // user.create({}).save
+      console.log()
       const result = await AppDataSource.createQueryBuilder().insert().into(User).values({
         username: options.username,
         password: hashedPassword,
@@ -167,12 +168,11 @@ export class UserResolver {
         };
       }
     }
-
+    // const newUser = await User.findOne({where:{id:user.id}}) as User
+    // console.log(newUser,'dfsd')
     req.session.userId = user.id;
 
-    return {
-      user,
-    };
+    return {user};
   }
 
   @Mutation(() => UserResponse)
@@ -196,6 +196,7 @@ export class UserResolver {
         ],
       };
     }
+    console.log('returned User',user)
     const valid = await argon2.verify(user.password, password);
     if (!valid) {
       return {
@@ -226,6 +227,7 @@ export class UserResolver {
         }
         res.clearCookie(COOKIE_NAME);
         resolve(true);
+        return
       })
     );
   }

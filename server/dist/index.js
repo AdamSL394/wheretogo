@@ -40,6 +40,7 @@ const main = async () => {
     AppDataSource.initialize()
         .then(async () => {
         console.log("Data Source has been initialized!");
+        await AppDataSource.runMigrations();
     })
         .catch((err) => {
         console.error("Error during Data Source initialization", err);
