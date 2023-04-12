@@ -16,6 +16,7 @@ exports.PostResolver = void 0;
 const Post_1 = require("../entities/Post");
 const type_graphql_1 = require("type-graphql");
 const isAuth_1 = require("../middleware/isAuth");
+const Updoot_1 = require("../entities/Updoot");
 let PostInput = class PostInput {
 };
 __decorate([
@@ -50,26 +51,45 @@ let PostResolver = class PostResolver {
         const isUpdoot = value !== -1;
         const realValue = isUpdoot ? 1 : -1;
         const { userId } = req.session;
-        await AppDataSource.query(`
-    START TRANSACTION;
-    
-    insert into updoot ("userId", "postId", value)
-    values (${userId},${postId},${realValue});
-
-    update post
-    set points = points + ${realValue}
-    where id= ${postId};
-
-    COMMIT;
-    `);
+        const updoot = await Updoot_1.Updoot.findOne({ where: { postId, userId } });
+        if (updoot && updoot.value !== realValue) {
+            await AppDataSource.transaction(async (tm) => {
+                await tm.query(` update updoot
+            set value = $1
+            where "postId" = $2 and "userId" = $3
+        `, [realValue, postId, userId]);
+                await tm.query(` 
+          update post 
+          set points = points + $1
+          where id= $2
+        `, [2 * realValue, postId]);
+            });
+        }
+        else if (!updoot) {
+            await AppDataSource.transaction(async (tm) => {
+                await tm.query(` 
+          insert into updoot("userId", "postId", value)
+          values ($1,$2, $3)
+        `, [userId, postId, realValue]);
+                await tm.query(`update post 
+          set points = points + $1
+          where id= $2
+        `, [realValue, postId]);
+            });
+        }
         return true;
     }
-    async posts(limit, cursor, { AppDataSource }) {
+    async posts(limit, cursor, { req, AppDataSource }) {
         const realLimit = Math.min(50, limit);
         const realLimitPlusOne = realLimit + 1;
         const replacements = [realLimitPlusOne];
+        if (req.session.userId) {
+            replacements.push(req.session.userId);
+        }
+        let cursorIdx = 3;
         if (cursor) {
             replacements.push(new Date(parseInt(cursor)));
+            cursorIdx = replacements.length;
         }
         const posts = await AppDataSource.query(`
     select p.*, 
@@ -77,14 +97,16 @@ let PostResolver = class PostResolver {
     'id', u.id,
     'email', u.email,
     'username', u.username
-    ) creator
+    ) creator,
+    ${req.session.userId
+            ? '(select value from updoot where "userId" = $2 and "postId" = p.id) "voteStatus"'
+            : 'null as "voteStatus"'}
     from post p
     inner join public.user u on u.id = p."creatorId"
-    ${cursor ? `where p."createdAt" <$2` : ''}
+    ${cursor ? `where p."createdAt" < $${cursorIdx}` : ''}
     order by p."createdAt" DESC
     limit $1
     `, replacements);
-        console.log(posts);
         return {
             posts: posts.slice(0, realLimit),
             hasMore: posts.length === realLimitPlusOne,
@@ -123,7 +145,7 @@ __decorate([
     (0, type_graphql_1.Mutation)(() => Boolean),
     (0, type_graphql_1.UseMiddleware)(isAuth_1.isAuth),
     __param(0, (0, type_graphql_1.Arg)('postId', () => type_graphql_1.Int)),
-    __param(1, (0, type_graphql_1.Arg)("value", () => type_graphql_1.Int)),
+    __param(1, (0, type_graphql_1.Arg)('value', () => type_graphql_1.Int)),
     __param(2, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number, Number, Object]),

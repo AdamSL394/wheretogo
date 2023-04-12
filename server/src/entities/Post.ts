@@ -29,14 +29,17 @@ export class Post extends BaseEntity {
 
   @Field()
   @Column({ type: 'int', default: 0 })
-  points!: string;
+  points!: number;
+
+  @Field(() => Int, { nullable: true })
+  voteStatus: number | null;
 
   @Field()
   @Column()
   creatorId: Number;
-  
+
   @OneToMany(() => Updoot, (updoot) => updoot.post)
-  updoots: Updoot[]; 
+  updoots: Updoot[];
 
   @Field()
   @ManyToOne(() => User, (user) => user.posts)
