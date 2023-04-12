@@ -144,6 +144,7 @@ let UserResolver = class UserResolver {
         const hashedPassword = await argon2.hash(options.password);
         let user;
         try {
+            console.log();
             const result = await AppDataSource.createQueryBuilder().insert().into(User_1.User).values({
                 username: options.username,
                 password: hashedPassword,
@@ -165,9 +166,7 @@ let UserResolver = class UserResolver {
             }
         }
         req.session.userId = user.id;
-        return {
-            user,
-        };
+        return { user };
     }
     async login(usernameOrEmail, password, { req }) {
         const user = await User_1.User.findOne(usernameOrEmail.includes('@')
@@ -183,6 +182,7 @@ let UserResolver = class UserResolver {
                 ],
             };
         }
+        console.log('returned User', user);
         const valid = await argon2.verify(user.password, password);
         if (!valid) {
             return {
@@ -208,6 +208,7 @@ let UserResolver = class UserResolver {
             }
             res.clearCookie(constants_1.COOKIE_NAME);
             resolve(true);
+            return;
         }));
     }
 };

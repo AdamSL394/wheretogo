@@ -25,15 +25,15 @@ export class User extends BaseEntity{
   updoots: Updoot[]; 
   
   @Field(() => String)
-  @Column({ unique: true })
-  username!: string;
+  @Column()
+  username: string;
   
   @Column({ unique: true })
   password!: string;
   
   @Field(() => String)
   @Column({ unique: true })
-  email!: String;
+  email!: string;
 
   @Field(() => String)
   @CreateDateColumn()
