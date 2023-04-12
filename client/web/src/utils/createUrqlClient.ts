@@ -27,44 +27,44 @@ const errorExchange: Exchange =
     );
   };
 
-export const cursorPagination = (): Resolver<any, any, any> => {
-  return (_parent, fieldArgs, cache, info) => {
-    const { parentKey: entityKey, fieldName } = info;
-    console.log(entityKey, fieldName)
-    const allFields = cache.inspectFields(entityKey);
-    console.log("allFields", allFields)
-    const fieldInfos = allFields.filter((info) => info.fieldName === fieldName);
-    const size = fieldInfos.length;
-    if (size === 0) {
-      return undefined;
-    }
-    console.log('hi')
-    const fieldKey = `${fieldName}(${stringifyVariables(fieldArgs)})`
-    const isItInTheCache = cache.resolve(cache.resolve(entityKey, fieldKey) as string, "posts")
+// export const cursorPagination = (): Resolver => {
+//   return (_parent, fieldArgs, cache, info) => {
+//     const { parentKey: entityKey, fieldName } = info;
+//     console.log(entityKey, fieldName)
+//     const allFields = cache.inspectFields(entityKey);
+//     console.log("allFields", allFields)
+//     const fieldInfos = allFields.filter((info) => info.fieldName === fieldName);
+//     const size = fieldInfos.length;
+//     if (size === 0) {
+//       return undefined;
+//     }
+//     console.log('hi')
+//     const fieldKey = `${fieldName}(${stringifyVariables(fieldArgs)})`
+//     const isItInTheCache = cache.resolve(cache.resolve(entityKey, fieldKey) as string, "posts")
 
-    info.partial  = !isItInTheCache;
-    console.log(info.partial)
-    let results: String[] = []
-    let hasMore = true;
-    fieldInfos.forEach(fi => {
-      const key = cache.resolve(entityKey, fi.fieldKey) as string;
-      const data = cache.resolve(key,"post") as string[];
-      const _hasMore = cache.resolve(key, "hasMore")
-      if(!_hasMore){
-        hasMore = _hasMore as boolean;
-      }
-      console.log("data: ", hasMore, data)
-      results.push(...data)
-    })
+//     info.partial  = !isItInTheCache;
+//     console.log(info.partial)
+//     let results: String[] = []
+//     let hasMore = true;
+//     fieldInfos.forEach(fi => {
+//       const key = cache.resolve(entityKey, fi.fieldKey) as string;
+//       const data = cache.resolve(key,"post") as string[];
+//       const _hasMore = cache.resolve(key, "hasMore")
+//       if(!_hasMore){
+//         hasMore = _hasMore as boolean;
+//       }
+//       console.log("data: ", hasMore, data)
+//       results.push(...data)
+//     })
 
-    return {
-      // not needed anymore 
-      _typename: "PaginatedPosts",
-      hasMore: true,
-      posts: results
-    }
-  };
-};
+//     return {
+//       // not needed anymore 
+//       _typename: "PaginatedPosts",
+//       hasMore: true,
+//       posts: results
+//     }
+//   };
+// };
 
 export const createUrqlClient = (ssrExchange: any) => ({
   url: 'http://localhost:4000/graphql',
@@ -79,11 +79,14 @@ export const createUrqlClient = (ssrExchange: any) => ({
       },
       resolvers: {
         Query: {
-          // posts: cursorPagination(),
+           //posts: cursorPagination(),
         },
       },
       updates: {
         Mutation: {
+          createPost:(_result, _args, cache, info) => {
+            
+          },
           logout: (_result, _args, cache, info) => {
             betterUpdateQuery<LogoutMutation, MeQuery>(
               cache,

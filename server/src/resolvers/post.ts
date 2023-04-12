@@ -14,7 +14,10 @@ import {
   ObjectType,
 } from 'type-graphql';
 import { MyContext } from 'src/types';
+<<<<<<< HEAD
 //import { isAuth } from '../../src/middleware/isAuth';
+=======
+>>>>>>> fcd30fe57a3011f5104eed2075d04c4c5257394d
 import { isAuth } from '../middleware/isAuth';
 
 @InputType()
@@ -90,13 +93,13 @@ export class PostResolver {
     ) creator
     from post p
     inner join public.user u on u.id = p."creatorId"
-    ${cursor ? `where p."creadtedAt" <$2` : ''}
+    ${cursor ? `where p."createdAt" <$2` : ''}
     order by p."createdAt" DESC
     limit $1
     `,
       replacements
     );
-
+      console.log(posts)
     return {
       posts: posts.slice(0, realLimit),
       hasMore: posts.length === realLimitPlusOne,
