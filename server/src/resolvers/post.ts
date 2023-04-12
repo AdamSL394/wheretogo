@@ -14,10 +14,6 @@ import {
   ObjectType,
 } from 'type-graphql';
 import { MyContext } from 'src/types';
-<<<<<<< HEAD
-//import { isAuth } from '../../src/middleware/isAuth';
-=======
->>>>>>> fcd30fe57a3011f5104eed2075d04c4c5257394d
 import { isAuth } from '../middleware/isAuth';
 
 @InputType()
