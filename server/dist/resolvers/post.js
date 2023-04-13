@@ -118,19 +118,36 @@ let PostResolver = class PostResolver {
     async createPost(input, { req }) {
         return Post_1.Post.create(Object.assign(Object.assign({}, input), { creatorId: req.session.userId })).save();
     }
-    async updatePost(id, title) {
-        const post = await Post_1.Post.findOne({ where: { id } });
-        if (!post) {
-            return null;
-        }
-        if (typeof title !== 'undefined') {
-            post.title = title;
-            await Post_1.Post.update({ id }, { title });
-        }
-        return post;
+    async updatePost(id, title, text, { req }) {
+        const post = await Post_1.Post.createQueryBuilder()
+            .update(Post_1.Post)
+            .set({ title, text })
+            .where('id = :id and creatorId = :creatorId', {
+            id,
+            creatorId: req.session.userId,
+        })
+            .returning('*')
+            .execute();
+        return post.raw[0];
     }
-    async deletePost(id) {
-        Post_1.Post.delete(id);
+    async deletePost(id, { req, AppDataSource }) {
+        const post = await Post_1.Post.findOne({ where: { id: id } });
+        if (!post) {
+            return false;
+        }
+        if (post.creatorId !== req.session.userId) {
+            throw new Error('Not Authorized');
+        }
+        await AppDataSource.createQueryBuilder()
+            .delete()
+            .from(Updoot_1.Updoot)
+            .where({ postId: id })
+            .execute();
+        await AppDataSource.createQueryBuilder()
+            .delete()
+            .from(Post_1.Post)
+            .where({ id })
+            .execute();
         return true;
     }
 };
@@ -178,17 +195,22 @@ __decorate([
 ], PostResolver.prototype, "createPost", null);
 __decorate([
     (0, type_graphql_1.Mutation)(() => Post_1.Post, { nullable: true }),
-    __param(0, (0, type_graphql_1.Arg)('id')),
-    __param(1, (0, type_graphql_1.Arg)('title', () => String, { nullable: true })),
+    (0, type_graphql_1.UseMiddleware)(isAuth_1.isAuth),
+    __param(0, (0, type_graphql_1.Arg)('id', () => type_graphql_1.Int)),
+    __param(1, (0, type_graphql_1.Arg)('title')),
+    __param(2, (0, type_graphql_1.Arg)('text')),
+    __param(3, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, String]),
+    __metadata("design:paramtypes", [Number, String, String, Object]),
     __metadata("design:returntype", Promise)
 ], PostResolver.prototype, "updatePost", null);
 __decorate([
     (0, type_graphql_1.Mutation)(() => Boolean),
-    __param(0, (0, type_graphql_1.Arg)('id')),
+    (0, type_graphql_1.UseMiddleware)(isAuth_1.isAuth),
+    __param(0, (0, type_graphql_1.Arg)('id', () => type_graphql_1.Int)),
+    __param(1, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], PostResolver.prototype, "deletePost", null);
 PostResolver = __decorate([
