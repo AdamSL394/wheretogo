@@ -8,6 +8,7 @@ import { UpdootSection } from '../components/UpdootSection';
 import { usePostsQuery } from '../generated/graphql';
 import { createUrqlClient } from '../utils/createUrqlClient';
 
+
 const Index = () => {
   const [variables, setVariable] = useState({
     limit: 15,
@@ -38,9 +39,12 @@ const Index = () => {
             <Box key={p.id} p={5} shadow="md" borderWidth="1px">
               <Flex>
                 <UpdootSection post={p} />
+                <NextLink href='/post/[id]'  as={`/post/${p.id}`}>
                 <Heading fontSize={'xl'}>
                   <div key={p.id}>{p.title}</div>
                 </Heading>
+                
+                </NextLink>
                 <Text ml="auto">Posted by: {p.creator.username}</Text>
               </Flex>
               <Text ml={9} mt={1}>

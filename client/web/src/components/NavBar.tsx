@@ -44,6 +44,9 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
 
   return (
     <Flex position="sticky" zIndex={1} top={0} bg="slategrey" p={4}>
+      <NextLink href="/">
+          Home
+      </NextLink>
       <div>{body}</div>
     </Flex>
   );
