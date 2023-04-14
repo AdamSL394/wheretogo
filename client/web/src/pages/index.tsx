@@ -1,15 +1,7 @@
-import {
-  Box,
-  Button,
-  Flex,
-  Heading,
-  IconButton,
-  Stack,
-  Text,
-} from '@chakra-ui/react';
+import { Box, Button, Flex, Heading, Stack, Text } from '@chakra-ui/react';
 import { withUrqlClient } from 'next-urql';
 import NextLink from 'next/link';
-import { use, useState } from 'react';
+import { useState } from 'react';
 import { DarkModeSwitch } from '../components/DarkModeSwitch';
 import { Layout } from '../components/Layout';
 import { UpdootSection } from '../components/UpdootSection';
@@ -19,7 +11,7 @@ import {
   usePostsQuery,
 } from '../generated/graphql';
 import { createUrqlClient } from '../utils/createUrqlClient';
-import { DeleteIcon, EditIcon } from '@chakra-ui/icons';
+import { EditDeletePostButtons } from '../components/EditDeletePostButtons';
 
 const Index = () => {
   const [variables, setVariable] = useState({
@@ -60,32 +52,10 @@ const Index = () => {
                     <Flex display="block">
                       <Text mr="auto">Posted by: {p.creator.username}</Text>
                       <Box>
-                        {meData?.me?.id === p.creator.id ? (
-                          <>
-                            <NextLink href='/post/edit/[id]' as={`/post/edit/${p.id}`}>
-                              <IconButton
-                                ml="auto"
-                                aria-label="edit Button"
-                                icon={<EditIcon />}
-                                onClick={() => {}}
-                              >
-                                {' '}
-                              </IconButton>
-                            </NextLink>
-                            <IconButton
-                              ml="auto"
-                              aria-label="delete Button"
-                              icon={<DeleteIcon />}
-                              onClick={() => {
-                                deletePost({ id: p.id });
-                              }}
-                            >
-                              {' '}
-                            </IconButton>{' '}
-                          </>
-                        ) : (
-                          <> </>
-                        )}
+                        <EditDeletePostButtons
+                          id={p.id}
+                          creatorId={p.creator.id}
+                        />
                       </Box>
                     </Flex>
                   </Flex>
