@@ -1,25 +1,57 @@
-import { withUrqlClient } from 'next-urql';
-import React from 'react';
-import { createUrqlClient } from '../../../utils/createUrqlClient';
 import { Box, Button } from '@chakra-ui/react';
-import { Formik, Form } from 'formik';
-import router from 'next/router';
+import { Form, Formik } from 'formik';
+import { withUrqlClient } from 'next-urql';
 import { InputField } from '../../../components/InputField';
 import { Layout } from '../../../components/Layout';
-import createPost from '../../create-post';
-import { useUpdatePostMutation } from '../../../generated/graphql';
+import {
+  usePostQuery,
+  useUpdatePostMutation,
+} from '../../../generated/graphql';
+import { createUrqlClient } from '../../../utils/createUrqlClient';
+import { useGetIntId } from '../../../utils/useGetIntId';
+import { useRouter } from 'next/router';
 
 export const EditPost = ({}) => {
-    const [_, updatePost] = useUpdatePostMutation();
+  const router = useRouter();
+  const intId = useGetIntId();
+  const [{ data, error, fetching }] = usePostQuery({
+    pause: intId === -1,
+    variables: {
+      postId: intId,
+    },
+  });
+  const [_, updatePost] = useUpdatePostMutation();
+
+  if (fetching) {
+    return (
+      <Layout>
+        <div>loading...</div>
+      </Layout>
+    );
+  }
+
+  if (!data?.post) {
+    return (
+      <Layout>
+        <Box>Couldn't find post</Box>
+      </Layout>
+    );
+  }
+
   return (
     <Layout variant="small">
       <Formik
-        initialValues={{ title: '', text: '' }}
+        initialValues={{ title: data.post.title, text: data.post.text }}
         onSubmit={async (values) => {
-          const { error } = await updatePost({ title: 'values', text:'asd' });
-          if (!error) {
-            router.push('/');
-          }
+          //   const { error } = await updatePost({ title: 'values', text:'asd' });
+          //   if (!error) {
+          //     router.push('/');
+          //   }
+          updatePost({
+            id: intId,
+            ...values,
+          });
+          router.push('/');
         }}
       >
         {({ isSubmitting }) => (
@@ -45,7 +77,7 @@ export const EditPost = ({}) => {
               type="submit"
               isLoading={isSubmitting}
             >
-              Create Post
+              Edit Post
             </Button>
           </Form>
         )}
