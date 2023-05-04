@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DataSource = void 0;
 const constants_1 = require("./constants");
+require("dotenv-safe/config");
 const express_1 = __importDefault(require("express"));
 require("reflect-metadata");
 const apollo_server_express_1 = require("apollo-server-express");
@@ -28,9 +29,7 @@ const main = async () => {
         type: 'postgres',
         host: 'localhost',
         port: 5432,
-        username: 'postgres',
-        password: 'password',
-        database: 'wheretogo',
+        url: process.env.DATABASE_URL,
         synchronize: true,
         logging: true,
         entities: [Post_1.Post, User_1.User, Updoot_1.Updoot],
@@ -46,7 +45,7 @@ const main = async () => {
     });
     const app = (0, express_1.default)();
     const RedisStore = (0, connect_redis_1.default)(express_session_1.default);
-    const redisClient = new ioredis_1.default();
+    const redisClient = new ioredis_1.default({ port: process.env.REDIS_URL });
     app.set('trust proxy', true);
     app.use((0, cookie_parser_1.default)());
     app.use((0, cors_1.default)({
@@ -54,9 +53,10 @@ const main = async () => {
         origin: [
             'https://studio.apollographql.com',
             'http://localhost:4000/graphql',
-            'http://localhost:3000',
+            process.env.CORS_ORIGIN
         ],
     }));
+    app.set("proxy", 1);
     app.use((0, express_session_1.default)({
         name: constants_1.COOKIE_NAME,
         store: new RedisStore({
@@ -69,7 +69,7 @@ const main = async () => {
             sameSite: 'lax',
         },
         saveUninitialized: false,
-        secret: 'keyboard cat',
+        secret: process.env.SESSION_SECRET,
         resave: false,
     }));
     const apolloServer = new apollo_server_express_1.ApolloServer({
@@ -99,7 +99,7 @@ const main = async () => {
     app.get('/', (_, res) => {
         res.send('Hello');
     });
-    app.listen(4000, () => {
+    app.listen(process.env.PORT, () => {
         console.log('Server up and running at Port 4000');
     });
 };

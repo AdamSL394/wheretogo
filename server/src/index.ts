@@ -1,6 +1,7 @@
 // import { MikroORM } from '@mikro-orm/core';
 import { COOKIE_NAME, __prod__ } from './constants';
 // import mikroOrmConfig from './mikro-orm.config';
+import "dotenv-safe/config"
 import express from 'express';
 import 'reflect-metadata';
 import { ApolloServer } from 'apollo-server-express';
@@ -33,9 +34,7 @@ const main = async () => {
     type: 'postgres',
     host: 'localhost',
     port: 5432,
-    username: 'postgres',
-    password: 'password',
-    database: 'wheretogo',
+    url: process.env.DATABASE_URL,
     synchronize: true,
     logging: true,
     entities: [Post,User, Updoot],
@@ -59,7 +58,7 @@ const main = async () => {
   const app = express();
 
   const RedisStore = connectRedis(session);
-  const redisClient = new Redis();
+  const redisClient = new Redis({port: process.env.REDIS_URL as unknown as number});
 
   app.set('trust proxy', true);
   app.use(cookieParser());
@@ -69,11 +68,11 @@ const main = async () => {
       origin: [
         'https://studio.apollographql.com',
         'http://localhost:4000/graphql',
-        'http://localhost:3000',
+        process.env.CORS_ORIGIN as string
       ],
     })
   );
-
+  app.set("proxy" , 1);
   app.use(
     session({
       name: COOKIE_NAME,
@@ -87,7 +86,7 @@ const main = async () => {
         sameSite: 'lax',
       },
       saveUninitialized: false,
-      secret: 'keyboard cat',
+      secret: process.env.SESSION_SECRET as string,
       resave: false,
     })
   );
@@ -121,7 +120,7 @@ const main = async () => {
   app.get('/', (_, res) => {
     res.send('Hello');
   });
-  app.listen(4000, () => {
+  app.listen(process.env.PORT, () => {
     console.log('Server up and running at Port 4000');
   });
 };
