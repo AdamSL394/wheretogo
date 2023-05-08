@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MockPosts1680060517806 = void 0;
 class MockPosts1680060517806 {
-    async up(queryRunner) {
+    async up(_) {
     }
     async down(_) { }
 }

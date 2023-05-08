@@ -30,7 +30,6 @@ const main = async () => {
         host: 'localhost',
         port: 5432,
         url: process.env.DATABASE_URL,
-        synchronize: true,
         logging: true,
         entities: [Post_1.Post, User_1.User, Updoot_1.Updoot],
         subscribers: [],
