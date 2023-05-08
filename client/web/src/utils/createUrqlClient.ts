@@ -9,7 +9,7 @@ import {
   VoteMutationVariables,
   DeletePostMutationVariables,
 } from '../generated/graphql';
-import { betterUpdateQuery } from '../pages/betterUpdateQuery';
+import  betterUpdateQuery  from './betterUpdateQuery';
 import { pipe, tap } from 'wonka';
 import { Exchange } from 'urql';
 import Router from 'next/router';
@@ -81,8 +81,9 @@ export const createUrqlClient = (ssrExchange: any, ctx: any) => {
   console.log('window', typeof window);
   if (isServer()) {
   }
+  console.log('api url',process.env.NEXT_PUBLIC_API_URL)
   return {
-    url: 'http://localhost:4000/graphql',
+    url: process.env.NEXT_PUBLIC_API_URL as string,
     fetchOptions: {
       credentials: 'include' as const,
     },

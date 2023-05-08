@@ -68,7 +68,8 @@ const main = async () => {
       origin: [
         'https://studio.apollographql.com',
         'http://localhost:4000/graphql',
-        process.env.CORS_ORIGIN as string
+        'https://pasteaplace.com'
+        //process.env.CORS_ORIGIN as string
       ],
     })
   );
