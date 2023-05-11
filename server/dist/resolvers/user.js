@@ -144,7 +144,6 @@ let UserResolver = class UserResolver {
         const hashedPassword = await argon2.hash(options.password);
         let user;
         try {
-            console.log();
             const result = await AppDataSource.createQueryBuilder().insert().into(User_1.User).values({
                 username: options.username,
                 password: hashedPassword,
@@ -165,8 +164,11 @@ let UserResolver = class UserResolver {
                 };
             }
         }
-        req.session.userId = user.id;
-        return { user };
+        const newUser = await User_1.User.findOne({ where: { id: user.id } });
+        console.log(newUser, 'dfsd');
+        req.session.userId = newUser.id;
+        console.log(user);
+        return { user: newUser };
     }
     async login(usernameOrEmail, password, { req }) {
         const user = await User_1.User.findOne(usernameOrEmail.includes('@')

@@ -147,8 +147,7 @@ export class UserResolver {
     const hashedPassword = await argon2.hash(options.password);
     let user;
     try {
-      // user.create({}).save
-      console.log()
+      //user!.create({}).save
       const result = await AppDataSource.createQueryBuilder().insert().into(User).values({
         username: options.username,
         password: hashedPassword,
@@ -168,11 +167,11 @@ export class UserResolver {
         };
       }
     }
-    // const newUser = await User.findOne({where:{id:user.id}}) as User
-    // console.log(newUser,'dfsd')
-    req.session.userId = user.id;
-
-    return {user};
+    const newUser = await User.findOne({where:{id:user.id}}) 
+    console.log(newUser,'dfsd')
+    req.session.userId = newUser!.id;
+    console.log(user)
+    return {user : newUser} as UserResponse;
   }
 
   @Mutation(() => UserResponse)

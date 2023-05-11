@@ -1,11 +1,11 @@
 #!/bin/bash
 
-echo hello
+echo What version is this ?
 
 read VERSION
 
-docker build -t adamsl/wheretogo:$VERSION
+docker build ./ -t adamsl394/wheretogo:$VERSION
 
-docker push adamsl/wheretogo:$VERSION
+docker push adamsl394/wheretogo:$VERSION
 
-ssh -v root@206.189.202.123
+ssh root@206.189.202.123 "docker pull adamsl394/wheretogo:$VERSION && docker tag adamsl394/wheretogo:$VERSION dokku/api:latest && dokku tags:deploy api latest"

@@ -41,9 +41,11 @@ export const Register: React.FC<registerProps> = ({ }) => {
           initialValues={{ email: '', username: '', password: '' }}
           onSubmit={async (values, { setErrors }) => {
             const response = await register({ options: values });
+            console.log("response",response)
             if (response.data?.register.errors) {
               setErrors(toErrorsMap(response.data.register.errors));
             } else if (response.data?.register.user) {
+              console.log("fsdfsdf")
               router.push('/');
             }
           }}

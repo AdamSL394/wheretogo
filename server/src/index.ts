@@ -28,30 +28,31 @@ declare module 'express-session' {
   }
 }
 
-const main = async () => {
 
+const main = async () => {
    const AppDataSource = new DataSource({
     type: 'postgres',
-    host: 'localhost',
-    port: 5432,
     url: process.env.DATABASE_URL,
     // synchronize: true,
     logging: true,
     entities: [Post,User, Updoot],
     subscribers: [],
-    migrations: [path.join(__dirname, "/migrations/*")],
+    migrations: [path.join(__dirname, "./migrations/*")],
   });
+
 
   AppDataSource.initialize()
     .then(async () => {
         console.log("Data Source has been initialized!")
         //await Post.delete({})
        // await AppDataSource.runMigrations()
+        // let test = await AppDataSource.query('SELECT * FROM public."user"')
+        // console.log('testtttt',test)
     })
     .catch((err) => {
         console.error("Error during Data Source initialization", err) 
-    }) 
-   
+    });
+
   // const orm = await MikroORM.init(mikroOrmConfig);
   // await orm.getMigrator().up();
 
@@ -60,7 +61,7 @@ const main = async () => {
   const RedisStore = connectRedis(session);
   const redisClient = new Redis({port: process.env.REDIS_URL as unknown as number});
 
-  app.set('trust proxy', true);
+  // app.set('trust proxy', true);
   app.use(cookieParser());
   app.use(
     cors({
@@ -68,8 +69,10 @@ const main = async () => {
       origin: [
         'https://studio.apollographql.com',
         'http://localhost:4000/graphql',
-        'https://pasteaplace.com'
-        //process.env.CORS_ORIGIN as string
+        'http://localhost:3000',
+        'https://pasteaplace.com',
+        'https://api.pasteaplace.com/',
+        process.env.CORS_ORIGIN as string
       ],
     })
   );
@@ -113,13 +116,14 @@ const main = async () => {
         'https://studio.apollographql.com',
         'http://localhost:4000/graphql',
         'http://localhost:3000',
+        'https://api.pasteaplace.com/'
       ],
       credentials: true,
     },
   });
 
   app.get('/', (_, res) => {
-    res.send('Hello');
+    res.send('Hello ' + "port: "+ process.env.PORT + " CORS ORIGIN: "  + process.env.CORS_ORIGIN + " " + process.env.DATABASE_URL + 'Redis url' + process.env.REDIS_URL + "Session secret " + process.env.SESSION_SECRET + "TEST 104!!!!");
   });
   app.listen(process.env.PORT, () => {
     console.log('Server up and running at Port 4000');
