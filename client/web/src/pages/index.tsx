@@ -2,7 +2,7 @@ import { Box, Button, Flex, Heading, Stack, Text } from '@chakra-ui/react';
 import { withUrqlClient } from 'next-urql';
 import NextLink from 'next/link';
 import { useState } from 'react';
-import { DarkModeSwitch } from '../components/DarkModeSwitch';
+import { EditDeletePostButtons } from '../components/EditDeletePostButtons';
 import { Layout } from '../components/Layout';
 import { UpdootSection } from '../components/UpdootSection';
 import {
@@ -11,7 +11,6 @@ import {
   usePostsQuery,
 } from '../generated/graphql';
 import { createUrqlClient } from '../utils/createUrqlClient';
-import { EditDeletePostButtons } from '../components/EditDeletePostButtons';
 
 const Index = () => {
   const [variables, setVariable] = useState({
@@ -30,7 +29,7 @@ const Index = () => {
 
   return (
     <Layout>
-      <DarkModeSwitch />
+
       {!data && fetching ? (
         <div>Loading...</div>
       ) : (

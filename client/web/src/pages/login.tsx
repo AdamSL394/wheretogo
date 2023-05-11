@@ -4,7 +4,6 @@ import { withUrqlClient } from 'next-urql';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
-import { DarkModeSwitch } from '../components/DarkModeSwitch';
 import { InputField } from '../components/InputField';
 import { NavBar } from '../components/NavBar';
 import { Wrapper } from '../components/Wrapper';
@@ -19,7 +18,7 @@ export const Login: React.FC<{}> = ({}) => {
     <>
     <NavBar></NavBar>
     <Wrapper>
-      <DarkModeSwitch />
+    
       <Formik
         initialValues={{ usernameOrEmail: '', password: '' }}
         onSubmit={async (values, { setErrors }) => {

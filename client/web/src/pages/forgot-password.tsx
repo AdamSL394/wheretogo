@@ -2,7 +2,6 @@ import { Box, Button } from '@chakra-ui/react';
 import { Form, Formik } from 'formik';
 import { withUrqlClient } from 'next-urql';
 import React, { useState } from 'react';
-import { DarkModeSwitch } from '../components/DarkModeSwitch';
 import { InputField } from '../components/InputField';
 import { Wrapper } from '../components/Wrapper';
 import { useForgotPasswordMutation } from '../generated/graphql';
@@ -13,7 +12,6 @@ const ForgotPassword: React.FC<{}> = ({}) => {
   const [, forgotPassword] = useForgotPasswordMutation();
   return (
     <Wrapper>
-      <DarkModeSwitch />
       <Formik
         initialValues={{ email:''}}
         onSubmit={async (values) => {

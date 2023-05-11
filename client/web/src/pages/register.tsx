@@ -1,17 +1,14 @@
 import { Box, Button } from '@chakra-ui/react';
-import { error } from 'console';
 import { Form, Formik } from 'formik';
+import { withUrqlClient } from 'next-urql';
+import { useRouter } from 'next/router';
 import React from 'react';
-import { useMutation } from 'urql';
-import { DarkModeSwitch } from '../components/DarkModeSwitch';
 import { InputField } from '../components/InputField';
+import { NavBar } from '../components/NavBar';
 import { Wrapper } from '../components/Wrapper';
 import { useRegisterMutation } from '../generated/graphql';
-import { toErrorsMap } from '../utils/toErrorsMap';
-import { useRouter } from 'next/router';
-import { withUrqlClient } from 'next-urql';
 import { createUrqlClient } from '../utils/createUrqlClient';
-import { NavBar } from '../components/NavBar';
+import { toErrorsMap } from '../utils/toErrorsMap';
 
 interface registerProps { }
 
@@ -36,7 +33,7 @@ export const Register: React.FC<registerProps> = ({ }) => {
     <>
       <NavBar></NavBar>
       <Wrapper>
-        <DarkModeSwitch />
+
         <Formik
           initialValues={{ email: '', username: '', password: '' }}
           onSubmit={async (values, { setErrors }) => {
