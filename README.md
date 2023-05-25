@@ -15,4 +15,4 @@ To run the backend locally cd in add a .env w/
 - Cors_origin
 
 
-&& npm run dev
+&& npm run dev.
