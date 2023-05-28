@@ -1,25 +1,23 @@
-// import { MikroORM } from '@mikro-orm/core';
 import { COOKIE_NAME, __prod__ } from './constants';
-// import mikroOrmConfig from './mikro-orm.config';
-import "dotenv-safe/config"
-import express from 'express';
-import 'reflect-metadata';
 import { ApolloServer } from 'apollo-server-express';
+import connectRedis from 'connect-redis';
+import cookieParser from 'cookie-parser';
+import cors from 'cors';
+import "dotenv-safe/config";
+import express from 'express';
+import session from 'express-session';
+import Redis from 'ioredis';
+import path from 'path';
+import 'reflect-metadata';
 import { buildSchema } from 'type-graphql';
+import { DataSource } from 'typeorm';
+import { Post } from './entities/Post';
+import { Updoot } from './entities/Updoot';
+import { User } from './entities/User';
 import { HelloResolver } from './resolvers/hello';
 import { PostResolver } from './resolvers/post';
 import { UserResolver } from './resolvers/user';
-import Redis from 'ioredis';
-import session from 'express-session';
-import connectRedis from 'connect-redis';
-import cors from 'cors';
-import cookieParser from 'cookie-parser';
-// import { MyContext } from './types';
-import { DataSource } from 'typeorm';
-import { Post } from './entities/Post';
-import { User } from './entities/User';
-import path from 'path';
-import { Updoot } from './entities/Updoot';
+;
 
 declare module 'express-session' {
   export interface SessionData {
@@ -30,38 +28,30 @@ declare module 'express-session' {
 
 
 const main = async () => {
-   const AppDataSource = new DataSource({
+  const AppDataSource = new DataSource({
     type: 'postgres',
     url: process.env.DATABASE_URL,
-    // synchronize: true,
     logging: true,
-    entities: [Post,User, Updoot],
-    subscribers: [],
+    entities: [Post, User, Updoot],
     migrations: [path.join(__dirname, "./migrations/*")],
   });
 
 
   AppDataSource.initialize()
     .then(async () => {
-        console.log("Data Source has been initialized!")
-        //await Post.delete({})
-       // await AppDataSource.runMigrations()
-        // let test = await AppDataSource.query('SELECT * FROM public."user"')
-        // console.log('testtttt',test)
+      console.log("Data Source has been initialized!")
+      // await Post.delete({})
+      // await AppDataSource.runMigrations()
     })
     .catch((err) => {
-        console.error("Error during Data Source initialization", err) 
+      console.error("Error during Data Source initialization", err)
     });
-
-  // const orm = await MikroORM.init(mikroOrmConfig);
-  // await orm.getMigrator().up();
 
   const app = express();
 
   const RedisStore = connectRedis(session);
-  const redisClient = new Redis({port: process.env.REDIS_URL as unknown as number});
+  const redisClient = new Redis(process.env.REDIS_URL);
 
-  // app.set('trust proxy', true);
   app.use(cookieParser());
   app.use(
     cors({
@@ -72,11 +62,12 @@ const main = async () => {
         'http://localhost:3000',
         'https://pasteaplace.com',
         'https://api.pasteaplace.com/',
-        process.env.CORS_ORIGIN as string
+        process.env.CORS_ORIGIN
       ],
     })
   );
-  app.set("proxy" , 1);
+  app.set("proxy", 1);
+
   app.use(
     session({
       name: COOKIE_NAME,
@@ -90,12 +81,13 @@ const main = async () => {
         sameSite: 'lax',
       },
       saveUninitialized: false,
-      secret: process.env.SESSION_SECRET as string,
+      secret: process.env.SESSION_SECRET,
       resave: false,
     })
   );
-// em: orm.em.fork(),
+
   const apolloServer = new ApolloServer({
+    persistedQueries: false,
     schema: await buildSchema({
       resolvers: [HelloResolver, PostResolver, UserResolver],
       validate: false,
@@ -116,14 +108,21 @@ const main = async () => {
         'https://studio.apollographql.com',
         'http://localhost:4000/graphql',
         'http://localhost:3000',
-        'https://api.pasteaplace.com/'
+        'https://api.pasteaplace.com/',
+        'https://pasteaplace.com',
+        process.env.CORS_ORIGIN
       ],
       credentials: true,
     },
   });
 
   app.get('/', (_, res) => {
-    res.send('Hello ' + "port: "+ process.env.PORT + " CORS ORIGIN: "  + process.env.CORS_ORIGIN + " " + process.env.DATABASE_URL + 'Redis url' + process.env.REDIS_URL + "Session secret " + process.env.SESSION_SECRET + "TEST 104!!!!");
+    res.send('Hello ' + "port: " + process.env.PORT +
+      "\n" + " CORS ORIGIN: " + process.env.CORS_ORIGIN + " "
+      + process.env.DATABASE_URL +
+      '\n Redis url ' + process.env.REDIS_URL
+      + "\n Session secret " + process.env.SESSION_SECRET +
+      "env" + process.env.NODE_ENV);
   });
   app.listen(process.env.PORT, () => {
     console.log('Server up and running at Port 4000');
@@ -131,7 +130,7 @@ const main = async () => {
 };
 
 main().catch((err) => {
-  console.log(err);
+  console.log('Muah error', err);
 });
 export { DataSource };
 

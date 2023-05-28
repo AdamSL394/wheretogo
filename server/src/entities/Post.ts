@@ -28,7 +28,7 @@ export class Post extends BaseEntity {
   text!: string;
 
   @Field()
-  @Column({ type: 'int', default: 0 })
+  @Column({ type: 'int', default: 0, nullable: true })
   points!: number;
 
   @Field(() => Int, { nullable: true })
