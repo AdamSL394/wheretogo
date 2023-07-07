@@ -61,12 +61,12 @@ const main = async () => {
         'http://localhost:4000/graphql',
         'http://localhost:3000',
         'https://pasteaplace.com',
-        'https://api.pasteaplace.com/',
+        'https://api.pasteaplace.com',
         process.env.CORS_ORIGIN
       ],
     })
   );
-  app.set("proxy", 1);
+  app.set("trust proxy", 1);
 
   app.use(
     session({

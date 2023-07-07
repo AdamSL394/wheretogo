@@ -51,11 +51,11 @@ const main = async () => {
             'http://localhost:4000/graphql',
             'http://localhost:3000',
             'https://pasteaplace.com',
-            'https://api.pasteaplace.com/',
+            'https://api.pasteaplace.com',
             process.env.CORS_ORIGIN
         ],
     }));
-    app.set("proxy", 1);
+    app.set("trust proxy", 1);
     app.use((0, express_session_1.default)({
         name: constants_1.COOKIE_NAME,
         store: new RedisStore({
