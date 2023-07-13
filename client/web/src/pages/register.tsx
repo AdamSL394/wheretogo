@@ -48,33 +48,33 @@ export const Register: React.FC<registerProps> = ({ }) => {
           }}
         >
           {({ isSubmitting }) => (
-            <Form>
+            <Form style={{padding:"1rem", margin:'auto'}}>
               <InputField
                 name={'username'}
-                placeholder={'username'}
+                placeholder={'Username'}
                 label={'Username'}
               ></InputField>
               <Box mt={4}>
                 <InputField
                   name={'email'}
-                  placeholder={'email'}
-                  label={'email'}
+                  placeholder={'Email'}
+                  label={'Email'}
                   type={'email'}
                 ></InputField>
               </Box>
               <Box mt={4}>
                 <InputField
                   name={'password'}
-                  placeholder={'password'}
+                  placeholder={'Password'}
                   label={'Password'}
                   type={'password'}
                 ></InputField>
               </Box>
               <Button
                 mt={4}
-                color={'white'}
+                color={'black'}
                 variant={'ghost'}
-                backgroundColor={'teal'}
+                backgroundColor={'#faf089'}
                 type="submit"
                 isLoading={isSubmitting}
               >

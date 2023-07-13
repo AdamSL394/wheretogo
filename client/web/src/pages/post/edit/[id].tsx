@@ -33,7 +33,7 @@ export const EditPost = ({}) => {
   if (!data?.post) {
     return (
       <Layout>
-        <Box>Couldn't find post</Box>
+        <Box><img src='./logo.png'/></Box>
       </Layout>
     );
   }

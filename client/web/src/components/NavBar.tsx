@@ -13,12 +13,11 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
   let body = null;
 
   if (fetching) {
-    <div>hi</div>;
+    <div>Loading...</div>;
   } else if (!data?.me) {
     body = (
       <span
         style={{
-
           display: 'flex',
           flexWrap: 'wrap',
           marginLeft: 'auto',
@@ -44,7 +43,7 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
           <strong>{data.me.username}</strong>
         </Box>
         <Button
-          color="blue.300"
+          color="Black"
           variant="link"
           mr={'8%'}
           onClick={async () => {
@@ -61,7 +60,7 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
 
   return (
   
-    <Flex position="sticky" zIndex={1} top={0} bg="slategrey" p={4}>
+    <Flex position="sticky" zIndex={1} top={0} bg="#1f9cee" p={4}>
     <DarkModeSwitch />
         
       <Flex flex={1} align="center" margin={'auto'} maxWidth={800}>

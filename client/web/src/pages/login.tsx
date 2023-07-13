@@ -18,7 +18,6 @@ export const Login: React.FC<{}> = ({}) => {
     <>
     <NavBar></NavBar>
     <Wrapper>
-    
       <Formik
         initialValues={{ usernameOrEmail: '', password: '' }}
         onSubmit={async (values, { setErrors }) => {
@@ -36,7 +35,7 @@ export const Login: React.FC<{}> = ({}) => {
         }}
       >
         {({ isSubmitting }) => (
-          <Form>
+          <Form style={{padding:"1rem",  margin:'auto'}}>
             <InputField
               name={'usernameOrEmail'}
               placeholder={'Username or Email'}
@@ -59,9 +58,9 @@ export const Login: React.FC<{}> = ({}) => {
             </Flex>
             <Button
               mt={4}
-              color={'white'}
+              color={'black'}
               variant={'ghost'}
-              backgroundColor={'teal'}
+              backgroundColor={'#faf089'}
               type="submit"
               isLoading={isSubmitting}
             >
